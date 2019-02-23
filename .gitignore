@@ -1,0 +1,18 @@
+# Scala
+*.class
+*.log
+
+# Simple Build Tool
+dist/*
+target/
+out/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+# Development files
+.env
