@@ -3,7 +3,9 @@ package io.github.aelesbao.yelp.importer
 object YelpDataImporterApp extends App {
   val usage =
     s"""
-       |spark-submit --class ${getClass.getName.dropRight(1)} <jar> YELP_DATA_TAR
+       |spark-submit --class ${getClass.getName.dropRight(1)} <jar> YELP_DATA
+       |
+       |YELP_DATA     path to Yelp JSON Dataset in any Hadoop supported file system
     """.stripMargin
 
   args.headOption match {

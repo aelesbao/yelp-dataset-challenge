@@ -6,9 +6,9 @@ version      in ThisBuild := "0.1.0-SNAPSHOT"
 
 lazy val root = (project in file("."))
   .settings(name := "yelp-dataset-challenge")
-  .aggregate(importer)
   .settings(commonSettings: _*)
   .disablePlugins(AssemblyPlugin)
+  .aggregate(common, importer)
 
 lazy val common = (project in file("common"))
   .disablePlugins(AssemblyPlugin)
@@ -16,6 +16,7 @@ lazy val common = (project in file("common"))
   .settings(libraryDependencies ++=
               Dependencies.spark ++
               Dependencies.logging ++
+              Dependencies.compression ++
               Dependencies.testing)
 
 lazy val importer = (project in file("importer"))
