@@ -17,6 +17,9 @@ lazy val common = (project in file("common"))
 lazy val importer = (project in file("importer"))
   .dependsOn(common)
   .settings(commonSettings: _*)
+  .settings(libraryDependencies ++=
+              Dependencies.spark ++
+              Dependencies.testing)
 
 def commonSettings: Seq[Setting[_]] = Seq(
   resolvers += Resolver.sonatypeRepo("releases"),
@@ -41,4 +44,11 @@ def commonSettings: Seq[Setting[_]] = Seq(
   // many of the tests due to the need to launch Spark in local mode
   fork in Test := true,
   javaOptions in Compile ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled"),
-  )
+
+  // Let "run" task uses all the libraries, including the ones marked with "provided"
+  run in Compile := Defaults.runTask(
+    fullClasspath in Compile,
+    mainClass in (Compile, run),
+    runner in (Compile, run)
+  ).evaluated
+)
