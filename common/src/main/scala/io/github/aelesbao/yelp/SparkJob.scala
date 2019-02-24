@@ -14,11 +14,17 @@ abstract class SparkJob extends Runnable with LazyLogging {
   protected implicit def sc: SparkContext = spark.sparkContext
 
   /**
+    * The name of your application. This will appear in the UI and in log data.
+    */
+  protected def appName: String
+
+  /**
     * Provides a default SparkConf that can be overridden in extending classes to customize its
     * behaviour.
     * @return a SparkConf with defaults from system properties and the classpath
     */
   protected def sparkConf: SparkConf = new SparkConf()
+    .setAppName(appName)
 
   private def createSparkSession(): SparkSession =
     SparkSession.builder()
