@@ -55,7 +55,12 @@ def commonSettings: Seq[Setting[_]] = Seq(
     fullClasspath in Compile,
     mainClass in (Compile, run),
     runner in (Compile, run)
-  ).evaluated
+  ).evaluated,
+
+  // Code coverage settings
+  coverageEnabled := true,
+  coverageMinimum := 90,
+  coverageFailOnMinimum := true
 )
 
 def assemblySettings: Seq[Setting[_]] = Seq(
