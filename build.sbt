@@ -10,7 +10,9 @@ lazy val root = (project in file("."))
 lazy val common = (project in file("common"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++=
-              Dependencies.spark)
+              Dependencies.spark ++
+              Dependencies.logging ++
+              Dependencies.testing)
 
 lazy val importer = (project in file("importer"))
   .dependsOn(common)
