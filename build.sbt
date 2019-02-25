@@ -25,6 +25,7 @@ lazy val importer = (project in file("importer"))
   .settings(assemblySettings: _*)
   .settings(libraryDependencies ++=
               Dependencies.spark ++
+              Dependencies.config ++
               Dependencies.testing)
 
 def commonSettings: Seq[Setting[_]] = Seq(

@@ -4,6 +4,8 @@ object Version {
   val spark = "2.4.0"
   val slf4j = "1.7.25"
   val scalaLogging = "2.1.2"
+  val typesafeConfig = "1.3.3"
+  val pureconfig = "0.10.2"
   val commonsCompress = "1.18"
 }
 
@@ -18,6 +20,11 @@ object Dependencies {
     "org.slf4j" % "slf4j-api" % Version.slf4j,
     "org.slf4j" % "slf4j-log4j12" % Version.slf4j,
     "com.typesafe.scala-logging" %% "scala-logging-slf4j" % Version.scalaLogging
+  )
+
+  val config: Seq[ModuleID] = Seq(
+    "com.typesafe" % "config" % Version.typesafeConfig,
+    "com.github.pureconfig" %% "pureconfig" % Version.pureconfig
   )
 
   val compression: Seq[ModuleID] = Seq(
