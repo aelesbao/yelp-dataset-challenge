@@ -1,13 +1,12 @@
 package io.github.aelesbao.yelp
 
-import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
 
 /**
   * Base class for Spark jobs with default implementations of the SparkSession and SparkConf.
   */
-abstract class SparkJob extends Runnable with LazyLogging {
+abstract class SparkJob extends Runnable with Serializable with TransientLazyLogging {
 
   protected implicit lazy val spark: SparkSession = createSparkSession()
 
