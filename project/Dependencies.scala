@@ -1,19 +1,25 @@
 import sbt._
 
 object Version {
-  val spark = "2.4.0"
+  val spark = "2.3.1"
   val slf4j = "1.7.25"
   val scalaLogging = "2.1.2"
   val typesafeConfig = "1.3.3"
   val pureconfig = "0.10.2"
   val commonsCompress = "1.18"
+  val sparkCassandra = "2.4.1"
 }
 
 object Dependencies {
   val spark: Seq[ModuleID] = Seq(
     "org.apache.spark" %% "spark-core" % Version.spark % Provided,
     "org.apache.spark" %% "spark-sql" % Version.spark % Provided,
-    "org.apache.spark" %% "spark-streaming" % Version.spark % Provided
+    "org.apache.spark" %% "spark-streaming" % Version.spark % Provided,
+    "org.apache.spark" %% "spark-hive" % Version.spark % Provided
+  )
+
+  val cassandra: Seq[ModuleID] = Seq(
+    "com.datastax.spark" %% "spark-cassandra-connector" % Version.sparkCassandra
   )
 
   val logging: Seq[ModuleID] = Seq(

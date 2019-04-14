@@ -28,5 +28,6 @@ abstract class SparkJob extends Runnable with Serializable with TransientLazyLog
   private def createSparkSession(): SparkSession =
     SparkSession.builder()
       .config(sparkConf)
+      .enableHiveSupport()
       .getOrCreate()
 }

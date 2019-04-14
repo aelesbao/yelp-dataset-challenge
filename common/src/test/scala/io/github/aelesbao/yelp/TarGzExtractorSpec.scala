@@ -12,7 +12,6 @@ class TarGzExtractorSpec extends FlatSpec with Matchers with SharedSparkSession 
   it should "extract files from .tar.gz" in {
     val files = sparkContext
       .tarGzFiles(filePath)
-      .groupByKey()
       .collect()
     files should have size 3
   }
@@ -20,8 +19,7 @@ class TarGzExtractorSpec extends FlatSpec with Matchers with SharedSparkSession 
   it should "expand compressed file names" in {
     val fileNames = sparkContext
       .tarGzFiles(filePath)
-      .groupByKey()
-      .map(_._1.fileName)
+      .map(_._2.name)
       .collect()
 
     fileNames should contain only(
@@ -31,9 +29,24 @@ class TarGzExtractorSpec extends FlatSpec with Matchers with SharedSparkSession 
     )
   }
 
+  it should "filter file name using regular expressions" in {
+    val fileNames = sparkContext
+      .tarGzFiles(filePath)
+      .filterByFileName(".*.json$")
+      .map(_._2.name)
+      .collect()
+
+    fileNames should contain only(
+      "results.json",
+      "characters.json"
+    )
+  }
+
   it should "extract file content lines" in {
     val fileContent = sparkContext
-      .tarGzFiles(filePath, fileNameFilter = Some("words"))
+      .tarGzFiles(filePath)
+      .filterByFileName("words")
+      .extractLines()
       .groupByKey()
       .flatMap(_._2)
       .collect()
@@ -46,22 +59,11 @@ class TarGzExtractorSpec extends FlatSpec with Matchers with SharedSparkSession 
     )
   }
 
-  it should "filter file name" in {
-    val fileNames = sparkContext
-      .tarGzFiles(filePath, fileNameFilter = Some(".*.json$"))
-      .groupByKey()
-      .map(_._1.fileName)
-      .collect()
-
-    fileNames should contain only(
-      "results.json",
-      "characters.json"
-    )
-  }
-
   it should "decode lines with UTF-8" in {
     val fileContents = sparkContext
-      .tarGzFiles(filePath, fileNameFilter = Some("results.json"))
+      .tarGzFiles(filePath)
+      .filterByFileName("results.json")
+      .extractLines()
       .groupByKey()
       .flatMap(_._2)
       .filter(_ != "")

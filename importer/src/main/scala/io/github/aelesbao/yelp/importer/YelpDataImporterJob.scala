@@ -1,9 +1,8 @@
 package io.github.aelesbao.yelp.importer
 
-import io.github.aelesbao.yelp.{SparkJob, TarFileKey}
+import io.github.aelesbao.yelp.{SparkJob, TarArchiveEntry}
 import io.github.aelesbao.yelp.Implicits._
-import org.apache.spark.rdd.RDD
-import org.apache.spark.storage.StorageLevel
+import org.apache.spark.sql.{Dataset, SaveMode}
 
 private class YelpDataImporterJob(dataPath: String) extends SparkJob {
 
@@ -11,22 +10,41 @@ private class YelpDataImporterJob(dataPath: String) extends SparkJob {
 
   override protected def appName: String = "Yelp Data Importer"
 
+  private val database: String = "yelp"
+
   override def run(): Unit = {
+    createDatabase()
+
     logger.info(s"Reading Yelp Dataset from $dataPath")
-    val files = sc.tarGzFiles(dataPath, fileNameFilter = Some(".*.json$"))
-      .groupByKey()
-      .persist(StorageLevel.DISK_ONLY)
+    val files = sc.tarGzFiles(dataPath)
+      .filterByFileName(".*.json$")
+      .cache()
 
-    files.keys.collect().foreach(writeToCassandra(files, _))
-
-    files.unpersist()
+    files.values.collect()
+      .foreach { entry =>
+        val table = getTableName(entry)
+        val lines = files.extractLines(entry).values.toDS()
+        writeToHive(table, lines)
+      }
   }
 
-  private def writeToCassandra(files: RDD[(TarFileKey, Iterable[String])],
-                               tarKey: TarFileKey): Unit = {
-    val tableName = tarKey.fileName.replaceAll("\\.[^.]*$", "")
-    val lines = files.filter(_._1 == tarKey).flatMap(_._2).toDS()
-    val df = spark.read.json(lines)
-    new CassandraWriter(tableName, df).write()
+  private def createDatabase(): Unit = {
+    if (!spark.catalog.databaseExists(database))
+      spark.sql(s"create database $database")
   }
+
+  private def writeToHive(table: String, lines: Dataset[String]): Unit = {
+    logger.info(s"Saving table $database.$table")
+
+    spark.read.json(lines.cache())
+      .write
+      .format("parquet")
+      .mode(SaveMode.Overwrite)
+      .saveAsTable(s"$database.$table")
+    logger.info(s"Saved records to $database.$table")
+
+    lines.unpersist()
+  }
+
+  private def getTableName: TarArchiveEntry => String = _.name.replaceAll("\\.[^.]*$", "")
 }

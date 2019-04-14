@@ -15,8 +15,8 @@ project/plugins/project/
 .lib/
 
 # Apache Spark files
-/metastore_db
-/spark-warehouse
+metastore_db/
+spark-warehouse/
 derby.log
 
 # Development files
